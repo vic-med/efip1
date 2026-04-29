@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repasador EFIP 1 · Derecho</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f1;
+    --bg3: #eeecea;
+    --text: #1a1a18;
+    --text2: #555550;
+    --text3: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --blue-bg: #e6f1fb;
+    --blue-text: #0c447c;
+    --blue-border: #b5d4f4;
+    --green-bg: #eaf3de;
+    --green-text: #27500a;
+    --green-border: #c0dd97;
+    --red-bg: #fcebeb;
+    --red-text: #791f1f;
+    --red-border: #f7c1c1;
+    --amber-bg: #faeeda;
+    --amber-text: #633806;
+    --amber-border: #fac775;
+    --teal-bg: #e1f5ee;
+    --teal-text: #085041;
+    --teal-border: #9fe1cb;
+    --purple-bg: #eeedfe;
+    --purple-text: #3c3489;
+    --purple-border: #cecbf6;
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg2: #242422;
+      --bg3: #2c2c2a;
+      --text: #f0ede8;
+      --text2: #b0ada8;
+      --text3: #777470;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.2);
+      --blue-bg: #042c53;
+      --blue-text: #b5d4f4;
+      --blue-border: #0c447c;
+      --green-bg: #173404;
+      --green-text: #c0dd97;
+      --green-border: #27500a;
+      --red-bg: #501313;
+      --red-text: #f7c1c1;
+      --red-border: #791f1f;
+      --amber-bg: #412402;
+      --amber-text: #fac775;
+      --amber-border: #633806;
+      --teal-bg: #04342c;
+      --teal-text: #9fe1cb;
+      --teal-border: #085041;
+      --purple-bg: #26215c;
+      --purple-text: #cecbf6;
+      --purple-border: #3c3489;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg3);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .app-shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+  }
+
+  /* HEADER */
+  .app-header {
+    padding: 1.5rem 0 1rem;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .app-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .app-header p {
+    font-size: 13px;
+    color: var(--text3);
+  }
+
+  /* NAV BAR */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .mod-pills { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .pill {
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 0.5px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .pill:hover { background: var(--bg2); }
+  .pill.active { background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); }
+
+  .mode-pills { display: flex; gap: 4px; }
+  .mode-pill {
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 0.5px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .mode-pill:hover { background: var(--bg2); }
+  .mode-pill.active { background: var(--bg2); color: var(--text); border-color: var(--border2); font-weight: 600; }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.visible { display: block; }
+
+  /* ── EXPLORAR ── */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+  }
+  .topic-card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 15px;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .topic-card:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .tc-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .badge-M1 { background: var(--blue-bg); color: var(--blue-text); }
+  .badge-M2 { background: var(--red-bg); color: var(--red-text); }
+  .badge-M3 { background: var(--green-bg); color: var(--green-text); }
+  .badge-M4 { background: var(--purple-bg); color: var(--purple-text); }
+  .tc-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--text); }
+
+  /* DETAIL */
+  .detail-back {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; color: var(--blue-text); cursor: pointer;
+    margin-bottom: 1rem; background: none; border: none; padding: 0;
+  }
+  .detail-back:hover { text-decoration: underline; }
+  .detail-title { font-size: 20px; font-weight: 600; margin-bottom: 1rem; }
+  .detail-body { font-size: 14px; line-height: 1.8; color: var(--text2); }
+  .detail-body p { margin-bottom: .75rem; }
+  .detail-body strong { font-weight: 600; color: var(--text); }
+  .detail-body ul { padding-left: 1.25rem; margin-bottom: .75rem; }
+  .detail-body li { margin-bottom: .35rem; }
+  .detail-body .sub {
+    margin-bottom: 1rem;
+    padding-left: 14px;
+    border-left: 2px solid var(--border2);
+  }
+
+  /* ── QUIZ ── */
+  .quiz-wrap { max-width: 580px; }
+  .quiz-progress {
+    font-size: 12px; color: var(--text3); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .progress-bar {
+    flex: 1; height: 4px; background: var(--border);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; background: var(--blue-text); border-radius: 2px; transition: width .3s; }
+  .quiz-q { font-size: 15px; font-weight: 500; margin-bottom: 1.1rem; line-height: 1.55; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .quiz-opt {
+    padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px;
+    border: 0.5px solid var(--border2); background: var(--bg);
+    cursor: pointer; text-align: left; color: var(--text); transition: all .12s;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--border2); background: var(--bg2); }
+  .quiz-opt.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+  .quiz-opt.wrong { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .quiz-feedback {
+    font-size: 13px; color: var(--text2); margin-bottom: 1rem;
+    line-height: 1.6; padding: 10px 14px;
+    background: var(--bg2); border-radius: var(--radius-sm);
+  }
+  .quiz-feedback strong { color: var(--text); }
+  .quiz-next {
+    padding: 8px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+    border: 0.5px solid var(--border2); background: transparent;
+    color: var(--text); cursor: pointer; transition: background .12s;
+  }
+  .quiz-next:hover { background: var(--bg2); }
+  .quiz-result {
+    padding: 1.5rem 0;
+  }
+  .quiz-result .score-num { font-size: 36px; font-weight: 700; color: var(--text); }
+  .quiz-result .score-label { font-size: 14px; color: var(--text2); margin-bottom: 1.25rem; }
+
+  /* ── CASOS ── */
+  .caso-wrap { max-width: 680px; }
+  .caso-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .caso-thumb {
+    padding: 8px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500;
+    border: 0.5px solid var(--border2); background: var(--bg);
+    cursor: pointer; transition: all .12s; color: var(--text2); text-align: left;
+  }
+  .caso-thumb:hover { background: var(--bg2); }
+  .caso-thumb.active { border-color: var(--border2); background: var(--bg2); color: var(--text); }
+  .caso-card {
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .caso-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .caso-num {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: .06em;
+    white-space: nowrap; padding-top: 2px;
+  }
+  .caso-title-block {}
+  .caso-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .caso-mod-tag {
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: .04em; display: inline-block;
+  }
+  .caso-body { padding: 1.25rem; }
+  .caso-relato {
+    font-size: 14px; line-height: 1.8; color: var(--text2);
+    background: var(--bg2); border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 1.25rem;
+    border-left: 3px solid var(--border2);
+  }
+  .caso-relato strong { color: var(--text); }
+  .caso-preguntas { display: flex; flex-direction: column; gap: 1.25rem; }
+  .caso-pregunta {}
+  .cpq-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; line-height: 1.5; }
+  .cpq-opts { display: flex; flex-direction: column; gap: 6px; }
+  .cpq-opt {
+    padding: 9px 13px; border-radius: var(--radius-sm); font-size: 13px;
+    border: 0.5px solid var(--border2); background: var(--bg);
+    cursor: pointer; text-align: left; color: var(--text); transition: all .12s;
+  }
+  .cpq-opt:hover:not(:disabled) { background: var(--bg2); }
+  .cpq-opt.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+  .cpq-opt.wrong { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .cpq-feedback {
+    margin-top: 8px; font-size: 13px; color: var(--text2);
+    padding: 9px 13px; background: var(--bg2); border-radius: var(--radius-sm); line-height: 1.6;
+  }
+  .cpq-feedback strong { color: var(--text); }
+  .caso-footer {
+    padding: .75rem 1.25rem; border-top: 0.5px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .caso-score-text { font-size: 13px; color: var(--text3); }
+  .caso-nav { margin-left: auto; display: flex; gap: 6px; }
+  .btn-sm {
+    padding: 6px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500;
+    border: 0.5px solid var(--border2); background: transparent;
+    color: var(--text); cursor: pointer; transition: background .12s;
+  }
+  .btn-sm:hover { background: var(--bg2); }
+
+  .empty-msg { font-size: 14px; color: var(--text3); padding: 1rem 0; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="app-header">
+    <h1>Repasador EFIP 1 · Derecho</h1>
+    <p>Constitucional · Penal · Privado · Procesal — UES21</p>
+  </div>
+
+  <div class="nav-bar">
+    <div class="mod-pills">
+      <button class="pill active" onclick="setMod('all',this)">Todos</button>
+      <button class="pill" onclick="setMod('M1',this)">Módulo 1 · Const.</button>
+      <button class="pill" onclick="setMod('M2',this)">Módulo 2 · Penal</button>
+      <button class="pill" onclick="setMod('M3',this)">Módulo 3 · Privado</button>
+      <button class="pill" onclick="setMod('M4',this)">Módulo 4 · Procesal</button>
+    </div>
+    <div class="mode-pills">
+      <button class="mode-pill active" id="btn-explorar" onclick="setMode('explorar')">Explorar</button>
+      <button class="mode-pill" id="btn-quiz" onclick="setMode('quiz')">Preguntas</button>
+      <button class="mode-pill" id="btn-casos" onclick="setMode('casos')">Casos</button>
+    </div>
+  </div>
+
+  <!-- EXPLORAR -->
+  <div id="screen-explorar" class="screen visible">
+    <div id="topic-grid" class="topic-grid"></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div id="screen-detail" class="screen">
+    <button class="detail-back" onclick="closeDetail()">← Volver</button>
+    <div class="detail-title" id="detail-title"></div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-wrap">
+      <div class="quiz-progress">
+        <span id="quiz-prog-text">Pregunta 1</span>
+        <div class="progress-bar"><div class="progress-fill" id="quiz-fill"></div></div>
+        <span id="quiz-score-text">0 correctas</span>
+      </div>
+      <div id="quiz-inner"></div>
+    </div>
+  </div>
+
+  <!-- CASOS -->
+  <div id="screen-casos" class="screen">
+    <div class="caso-wrap">
+      <div class="caso-selector" id="caso-selector"></div>
+      <div id="caso-display"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+
+const MOD_LABELS = { M1:'Módulo 1 · Constitucional', M2:'Módulo 2 · Penal', M3:'Módulo 3 · Privado', M4:'Módulo 4 · Procesal' };
+const MOD_COLORS = { M1:'badge-M1', M2:'badge-M2', M3:'badge-M3', M4:'badge-M4' };
+
+const TOPICS = [
+  { id:'t01', mod:'M1', title:'Poder constituyente y reforma',
+    summary:`<p>El <strong>poder constituyente originario</strong> es ilimitado y funda el Estado. El <strong>derivado</strong> opera dentro de los límites del art. 30 CN.</p>
+<div class="sub"><p><strong>Etapas de la reforma:</strong></p><ul><li><strong>Iniciativa:</strong> el Congreso declara la necesidad con 2/3 de cada Cámara.</li><li><strong>Revisión:</strong> Convención Constituyente elegida, circunscripta al temario.</li><li><strong>Eficacia:</strong> entrada en vigor.</li></ul></div>
+<p>El titular es <strong>el pueblo</strong>. Los límites materiales (cláusulas pétreas: federalismo, democracia, república) son implícitos.</p>`},
+  { id:'t02', mod:'M1', title:'Supremacía y bloque constitucional',
+    summary:`<p>El <strong>art. 31 CN</strong> establece la supremacía. Tras la reforma de 1994, el <strong>art. 75 inc. 22</strong> otorgó jerarquía constitucional a 11 instrumentos de DDHH.</p>
+<div class="sub"><p>El <strong>bloque de constitucionalidad federal</strong> incluye la CN + esos tratados, todos al mismo nivel. Ante aparente conflicto se aplica la norma <em>más favorable a la persona</em>.</p></div>`},
+  { id:'t03', mod:'M1', title:'Control de constitucionalidad',
+    summary:`<p>En Argentina el control es <strong>jurisdiccional difuso</strong>: cualquier juez puede declararlo en un caso concreto.</p>
+<div class="sub"><ul><li><strong>Vía:</strong> principalmente indirecta (excepción); también directa (amparo, acción declarativa).</li><li><strong>Efectos:</strong> <em>inter partes</em>; no deroga la norma para terceros.</li><li><strong>Control de oficio:</strong> tendencia jurisprudencial creciente.</li></ul></div>`},
+  { id:'t04', mod:'M1', title:'Federalismo argentino',
+    summary:`<p>Las relaciones entre Nación y provincias son de <strong>subordinación</strong> (supremacía federal), <strong>participación</strong> (provincias en el Congreso) y <strong>coordinación</strong> (distribución de competencias).</p>
+<div class="sub"><p>Competencias: <strong>exclusivas federales</strong> (moneda, códigos de fondo…), <strong>exclusivas provinciales</strong> (poderes no delegados), <strong>concurrentes</strong> (ambiente, educación) y <strong>compartidas</strong> (creación de provincias).</p></div>`},
+  { id:'t05', mod:'M1', title:'Derechos: 1ª, 2ª y 3ª generación',
+    summary:`<div class="sub"><p><strong>1ª generación:</strong> libertades negativas. Trabajar, comerciar, asociarse, intimidad (art. 19), sufragio (art. 37).</p></div>
+<div class="sub"><p><strong>2ª generación:</strong> libertades positivas. Art. 14 bis: condiciones dignas, salario mínimo, huelga, seguridad social.</p></div>
+<div class="sub"><p><strong>3ª generación:</strong> ambiente sano (art. 41), consumidores (art. 42), pueblos indígenas (art. 75 inc. 17).</p></div>
+<p>El <strong>art. 33 CN</strong> reconoce derechos implícitos no enumerados.</p>`},
+  { id:'t06', mod:'M1', title:'Garantías: art. 18 CN y art. 8 CADH',
+    summary:`<p>El <strong>debido proceso</strong> exige juicio previo fundado en ley anterior, juez natural, defensa en juicio, prohibición de autoincriminación.</p>
+<div class="sub"><ul><li><strong>Hábeas corpus (art. 43):</strong> tutela la libertad física. Clases: reparador, preventivo, correctivo.</li><li><strong>Amparo (art. 43):</strong> acción rápida contra arbitrariedad o ilegalidad manifiesta que afecte derechos.</li><li><strong>Hábeas data (art. 43):</strong> acceso, rectificación y supresión de datos personales.</li></ul></div>`},
+  { id:'t07', mod:'M1', title:'Poder Legislativo',
+    summary:`<p>El Congreso es <strong>bicameral</strong>: Cámara de Diputados (representación proporcional) y Senado (3 por provincia + 3 por CABA).</p>
+<div class="sub"><p><strong>Principales atribuciones (art. 75):</strong> dictar leyes, aprobar tratados, presupuesto, coparticipación, intervención federal, estado de sitio, juicio político.</p></div>`},
+  { id:'t08', mod:'M1', title:'Poder Ejecutivo y Jefe de Gabinete',
+    summary:`<p>PE unipersonal: Presidente. Elegido por <strong>doble vuelta</strong>, mandato 4 años, una reelección consecutiva.</p>
+<div class="sub"><p><strong>Atribuciones (art. 99):</strong> jefe de Estado y Gobierno, DNU (no en materia penal, tributaria, electoral ni partidos políticos), veto, indulto.</p></div>
+<div class="sub"><p><strong>Jefe de Gabinete (art. 100):</strong> responsable ante el Congreso. Ejerce la administración general. Removible por moción de censura.</p></div>`},
+  { id:'t09', mod:'M1', title:'Poder Judicial y Consejo de la Magistratura',
+    summary:`<p><strong>Corte Suprema:</strong> intérprete final de la CN. Jueces designados por el PEN con acuerdo del Senado (2/3). Solo removibles por juicio político.</p>
+<div class="sub"><p><strong>Jueces inferiores:</strong> terna vinculante del <strong>Consejo de la Magistratura</strong>; removidos por el <strong>Jurado de Enjuiciamiento</strong>.</p></div>
+<p>Garantías: <strong>inamovilidad</strong> e <strong>intangibilidad</strong> de remuneraciones (art. 110). <strong>Ministerio Público</strong> (art. 120): órgano extrapoderes con independencia funcional.</p>`},
+  { id:'t10', mod:'M2', title:'Principios penales: legalidad, lesividad, non bis in ídem',
+    summary:`<div class="sub"><p><strong>Legalidad:</strong> ley escrita, previa, estricta y cierta. Excluye la analogía en perjuicio del imputado.</p></div>
+<div class="sub"><p><strong>Lesividad:</strong> solo intervención penal ante afectación grave de bienes jurídicos. El derecho penal es <em>ultima ratio</em>.</p></div>
+<div class="sub"><p><strong>Non bis in ídem:</strong> nadie puede ser juzgado ni sancionado dos veces por el mismo hecho.</p></div>`},
+  { id:'t11', mod:'M2', title:'Validez temporal de la ley penal',
+    summary:`<p>Principio general: ley vigente al momento de comisión del hecho.</p>
+<div class="sub"><p><strong>Retroactividad:</strong> se aplica la ley posterior más benigna, incluso frente a sentencia firme.</p></div>
+<div class="sub"><p><strong>Ultraactividad:</strong> la ley más favorable al momento del hecho sigue aplicando aunque sea reemplazada por una más gravosa. Se incluyen <em>leyes intermedias</em>.</p></div>`},
+  { id:'t12', mod:'M2', title:'Teoría del delito',
+    summary:`<p>Cuatro categorías secuenciales: <strong>acción → tipicidad → antijuridicidad → culpabilidad</strong>.</p>
+<div class="sub"><p><strong>Tipo objetivo:</strong> descripción externa de la conducta. La <em>imputación objetiva</em> exige resultado atribuible a un riesgo no permitido creado por el autor.</p></div>
+<div class="sub"><p><strong>Dolo:</strong> conocimiento y voluntad de realizar el tipo. Clases: directo, indirecto y eventual (acepta el resultado probable).</p></div>
+<div class="sub"><p><strong>Antijuridicidad:</strong> contradicción con el ordenamiento. Las causas de justificación la eliminan.</p></div>`},
+  { id:'t13', mod:'M2', title:'Legítima defensa y estado de necesidad',
+    summary:`<div class="sub"><p><strong>Legítima defensa:</strong> requisitos: agresión ilegítima, necesidad racional del medio empleado, falta de provocación suficiente.</p></div>
+<div class="sub"><p><strong>Estado de necesidad justificante:</strong> mal causado menor al evitado. <strong>Exculpante:</strong> mal igual o mayor, pero hay inexigibilidad.</p></div>`},
+  { id:'t14', mod:'M2', title:'Culpabilidad e imputabilidad',
+    summary:`<p><strong>Culpabilidad:</strong> reproche personal al autor. Principio: <em>nulla poena sine culpa</em>.</p>
+<div class="sub"><p><strong>Imputabilidad:</strong> capacidad de comprender la criminalidad del acto y dirigir las acciones. La inimputabilidad puede derivar de insuficiencia de facultades mentales o alteraciones morbosas.</p></div>`},
+  { id:'t15', mod:'M2', title:'Iter criminis y tentativa',
+    summary:`<p>Solo la fase ejecutiva es punible.</p>
+<div class="sub"><p><strong>Tentativa (art. 42 CP):</strong> comienzo de ejecución + dolo de consumar + no consumación ajena al autor. Pena reducida en 1/3 a 1/2.</p></div>
+<div class="sub"><p><strong>Desistimiento voluntario:</strong> abandono espontáneo → exime de pena por tentativa.</p></div>`},
+  { id:'t16', mod:'M2', title:'Participación criminal',
+    summary:`<div class="sub"><p><strong>Autor:</strong> dominio del hecho. <strong>Coautor:</strong> dominio funcional + decisión conjunta.</p></div>
+<div class="sub"><p><strong>Complicidad necesaria:</strong> sin esa cooperación el delito no se hubiera podido cometer. Misma escala penal que el autor.</p></div>
+<div class="sub"><p><strong>Complicidad no necesaria:</strong> cooperación secundaria. Escala reducida.</p></div>`},
+  { id:'t17', mod:'M2', title:'Concurso de delitos',
+    summary:`<div class="sub"><p><strong>Concurso ideal (art. 54):</strong> un hecho único encuadra en varios tipos. Pena: la mayor.</p></div>
+<div class="sub"><p><strong>Delito continuado:</strong> pluralidad de actos con única resolución criminal, homogeneidad objetiva, mismo bien jurídico, proximidad temporal.</p></div>
+<div class="sub"><p><strong>Concurso real (art. 55):</strong> pluralidad de hechos independientes juzgados en el mismo proceso.</p></div>`},
+  { id:'t18', mod:'M3', title:'Persona humana: atributos y personalísimos',
+    summary:`<div class="sub"><p><strong>Derechos personalísimos:</strong> vida, salud, imagen, intimidad, identidad, honor. Extrapatrimoniales, intransmisibles, irrenunciables.</p></div>
+<div class="sub"><p><strong>Atributos:</strong> nombre, domicilio (real, legal, especial), capacidad (de derecho y de ejercicio), estado civil.</p></div>
+<p>La <strong>capacidad de ejercicio se presume</strong>; las limitaciones son excepcionales.</p>`},
+  { id:'t19', mod:'M3', title:'Incapacidad y capacidad restringida',
+    summary:`<p>El juez declara <strong>incapacidad</strong> solo si la persona está absolutamente imposibilitada. Si no, declara <strong>capacidad restringida</strong> con apoyos.</p>
+<div class="sub"><p>Procedimiento: entrevista personal obligatoria, dictamen interdisciplinario, revisión mínima cada 3 años.</p></div>
+<div class="sub"><p><strong>Adolescentes:</strong> discernimiento para actos lícitos desde los 13 años; derecho a ser oído.</p></div>`},
+  { id:'t20', mod:'M3', title:'Persona jurídica',
+    summary:`<p>Entes con aptitud para adquirir derechos y contraer obligaciones para el cumplimiento de su objeto.</p>
+<div class="sub"><p><strong>Inoponibilidad de la personalidad:</strong> cuando se usa para violar la ley o defraudar a terceros. Aplicación restrictiva.</p></div>
+<div class="sub"><p><strong>Atributos:</strong> nombre, domicilio/sede social, patrimonio, capacidad de derecho (limitada al objeto social).</p></div>`},
+  { id:'t21', mod:'M3', title:'Actos jurídicos y vicios',
+    summary:`<p>El <strong>acto jurídico</strong> es el hecho humano voluntario lícito con fin inmediato de adquirir, modificar o extinguir relaciones jurídicas.</p>
+<div class="sub"><p><strong>Vicios de la voluntad:</strong> error esencial y reconocible (nulidad), dolo esencial (nulidad) vs. incidental (indemnización), violencia (nulidad).</p></div>
+<div class="sub"><p><strong>Vicios propios:</strong> lesión (desproporción + explotación), simulación (discordancia consciente entre voluntad real y declarada), fraude (acción de inoponibilidad del acreedor).</p></div>`},
+  { id:'t22', mod:'M3', title:'Contratos: formación y clasificación',
+    summary:`<p>El <strong>contrato</strong> es el acto jurídico bilateral que crea, modifica o extingue relaciones jurídicas patrimoniales.</p>
+<div class="sub"><p><strong>Clasificaciones:</strong> bilateral/unilateral, oneroso/gratuito, conmutativo/aleatorio, formal/no formal.</p></div>
+<div class="sub"><p><strong>Adhesión:</strong> cláusulas predispuestas, control de incorporación y contenido. <strong>Consumo:</strong> protección al consumidor, buena fe, información.</p></div>`},
+  { id:'t23', mod:'M3', title:'Objeto, causa y forma del contrato',
+    summary:`<div class="sub"><p><strong>Objeto:</strong> bienes y hechos. No puede ser prohibido, imposible, contrario a la moral o lesivo de derechos ajenos.</p></div>
+<div class="sub"><p><strong>Causa:</strong> fin inmediato (objetiva) y motivos incorporados (subjetiva). Ausencia o ilicitud → nulidad.</p></div>
+<div class="sub"><p><strong>Forma:</strong> libertad como regla; contratos formales solemnes (forma = validez) y no solemnes (forma = prueba).</p></div>`},
+  { id:'t24', mod:'M3', title:'Extinción del contrato',
+    summary:`<div class="sub"><p><strong>Rescisión bilateral:</strong> mutuo acuerdo. <strong>Unilateral:</strong> cuando la ley o el contrato lo prevén.</p></div>
+<div class="sub"><p><strong>Resolución:</strong> por incumplimiento. Cláusula expresa: opera automáticamente. Implícita: requiere interpelación.</p></div>
+<div class="sub"><p><strong>Frustración del fin:</strong> finalidad frustrada por hecho ajeno e imprevisible → rescisión.</p></div>
+<div class="sub"><p><strong>Imprevisión:</strong> prestación excesivamente onerosa por alteración extraordinaria → revisión o resolución.</p></div>`},
+  { id:'t25', mod:'M3', title:'Contratos típicos: compraventa, locación, mandato',
+    summary:`<div class="sub"><p><strong>Compraventa:</strong> transferencia del dominio a cambio de un precio en dinero. Bilateral, onerosa, conmutativa.</p></div>
+<div class="sub"><p><strong>Locación:</strong> uso y goce a cambio de un precio. Plazo mínimo 3 años (vivienda).</p></div>
+<div class="sub"><p><strong>Mandato:</strong> con representación (efectos directos en el mandante) o sin representación (efectos en el mandatario). El poder es la declaración unilateral que habilita al representante frente a terceros.</p></div>`},
+  { id:'t26', mod:'M4', title:'Jurisdicción y competencia',
+    summary:`<p><strong>Jurisdicción:</strong> poder-deber del Estado de dirimir conflictos. Caracteres: pública, única, exclusiva, indelegable, inderogable.</p>
+<div class="sub"><p><strong>Competencia:</strong> criterios: materia (fuero), territorio, grado, valor, turno.</p></div>
+<div class="sub"><p><strong>Federal:</strong> excepcional; por materia (CN, leyes nacionales, tratados) o por las personas (Estado Nacional, embajadores).</p></div>
+<p><strong>Inhibición</strong> (el juez se aparta de oficio) y <strong>recusación</strong> (la parte lo pide).</p>`},
+  { id:'t27', mod:'M4', title:'Acción y excepción procesal',
+    summary:`<p><strong>Acción:</strong> poder abstracto de requerir tutela jurisdiccional. <strong>Pretensión:</strong> contenido: sujetos, objeto (inmediato y mediato) y causa.</p>
+<div class="sub"><p>En civil: principio dispositivo. En penal: Fiscal actúa por legalidad. En laboral/familia: rasgos inquisitivos.</p></div>
+<div class="sub"><p><strong>Excepción:</strong> poder del demandado de repeler la acción. Dilatorias vs. perentorias.</p></div>`},
+  { id:'t28', mod:'M4', title:'Sujetos del proceso y actos procesales',
+    summary:`<div class="sub"><p><strong>Sujetos esenciales:</strong> tribunal (imparcial), actor y demandado (duales, antagónicos, iguales).</p></div>
+<div class="sub"><p><strong>Proceso penal:</strong> tribunal, Ministerio Público Fiscal, querellante particular, actor civil, imputado.</p></div>
+<div class="sub"><p><strong>Cargas procesales:</strong> conductas facultativas cuya omisión acarrea consecuencias desfavorables (sin sanción directa).</p></div>`},
+  { id:'t29', mod:'M4', title:'Prueba judicial',
+    summary:`<div class="sub"><p><strong>Valoración:</strong></p><ul><li><em>Tarifa legal:</em> la ley predetermina el valor.</li><li><em>Sana crítica racional:</em> lógica + experiencia + fundamentación. Es el sistema predominante.</li><li><em>Íntima convicción:</em> sin fundamentación lógica (jurados).</li></ul></div>
+<div class="sub"><p><strong>Carga dinámica:</strong> prueba quien está en mejores condiciones. En penal, el Fiscal prueba; el imputado no carga con su inocencia.</p></div>`},
+  { id:'t30', mod:'M4', title:'Sentencia, cosa juzgada e impugnación',
+    summary:`<p><strong>Sentencia:</strong> estructura tripartita: vistos / considerandos / resuelvo. Principio de <em>congruencia</em>.</p>
+<div class="sub"><p><strong>Cosa juzgada formal:</strong> inmutabilidad dentro del proceso. <strong>Material:</strong> inmutabilidad absoluta; triple identidad: sujeto, objeto, causa.</p></div>
+<div class="sub"><p><strong>Medidas cautelares:</strong> <em>fumus boni iuris</em> (verosimilitud), <em>periculum in mora</em> (peligro en la demora) y contracautela.</p></div>`}
+];
+
+const QUIZ = [
+  { q:'¿Cuántos instrumentos internacionales de DDHH adquirieron jerarquía constitucional en 1994?', opts:['7','11','5','15'], c:1, exp:'El art. 75 inc. 22 incorporó 11 instrumentos (CADH, PIDCP, DUDH, etc.) al mismo nivel que la Constitución.', mod:'M1' },
+  { q:'¿Quién ejerce el poder constituyente derivado en Argentina?', opts:['El Congreso Nacional','La Corte Suprema','La Convención Constituyente','El Poder Ejecutivo'], c:2, exp:'Según el art. 30 CN, la reforma la realiza una Convención especialmente elegida. El Congreso solo declara la necesidad.', mod:'M1' },
+  { q:'El sistema argentino de control de constitucionalidad es…', opts:['Concentrado y erga omnes','Difuso e inter partes','Concentrado e inter partes','Difuso y erga omnes'], c:1, exp:'Cualquier juez puede declarar la inconstitucionalidad (difuso) pero solo para el caso concreto (inter partes), sin derogar la norma.', mod:'M1' },
+  { q:'El principio de retroactividad penal permite…', opts:['Aplicar siempre la ley más antigua','Aplicar la ley vigente al momento del fallo sin excepciones','Aplicar la ley posterior más benigna, incluso ante sentencia firme','Prohibir toda aplicación de leyes posteriores al hecho'], c:2, exp:'La retroactividad benigna admite aplicar una ley posterior favorable al imputado, incluso cuando ya existe sentencia firme.', mod:'M2' },
+  { q:'¿Cuál es la diferencia entre estado de necesidad justificante y exculpante?', opts:['En el justificante hay dolo; en el exculpante, culpa','En el justificante el mal causado es menor; en el exculpante es igual o mayor','El justificante requiere peligro; el exculpante no','Son sinónimos en el CP argentino'], c:1, exp:'El justificante elimina la antijuridicidad (mal menor). El exculpante elimina la culpabilidad por inexigibilidad (mal igual o mayor).', mod:'M2' },
+  { q:'¿Cuándo existe concurso ideal de delitos?', opts:['Varios hechos independientes juzgados juntos','Un hecho único que encuadra en varios tipos penales','Varios actos unidos por una sola resolución criminal','Reiteración del mismo delito en distintas ocasiones'], c:1, exp:'El concurso ideal (art. 54 CP) ocurre cuando un único hecho cae bajo más de un tipo penal. Se aplica solo la pena mayor.', mod:'M2' },
+  { q:'¿A qué edad se adquiere el discernimiento para actos lícitos según el CCyC?', opts:['10 años','14 años','13 años','18 años'], c:2, exp:'El CCyC fija en 13 años el discernimiento para actos lícitos; para actos ilícitos, basta con 10 años.', mod:'M3' },
+  { q:'La inoponibilidad de la personalidad jurídica procede cuando…', opts:['La empresa tiene pérdidas','Se usa la persona jurídica para violar la ley o defraudar terceros','Los socios no pueden pagar deudas personales','El objeto social cambia sin autorización judicial'], c:1, exp:'La figura del "corrimiento del velo societario" responsabiliza a los socios cuando la persona jurídica fue usada como instrumento de ilicitud o fraude. Es de aplicación restrictiva.', mod:'M3' },
+  { q:'¿Cuál es el plazo mínimo de la locación de vivienda en el CCyC?', opts:['2 años','6 meses','3 años','1 año'], c:2, exp:'El CCyC establece un plazo mínimo de 3 años para los contratos de locación con destino habitacional.', mod:'M3' },
+  { q:'El principio de congruencia en la sentencia exige…', opts:['Aplicar siempre la norma más favorable','Identidad entre lo resuelto y las pretensiones y defensas planteadas','Fundar la sentencia en precedentes de la Corte','Dictar sentencia dentro del plazo legal'], c:1, exp:'La congruencia impide fallar ultra petita (más de lo pedido), citra petita (omitir algo) o extra petita (algo distinto), garantizando igualdad.', mod:'M4' },
+  { q:'¿Cuál es el sistema de valoración de la prueba predominante en los códigos procesales modernos?', opts:['Prueba legal o tarifa legal','Íntima convicción','Sana crítica racional','Libre convicción sin fundamentación'], c:2, exp:'La sana crítica racional exige que el juez valore con lógica y experiencia y funde expresamente su decisión. Es el sistema predominante.', mod:'M4' },
+  { q:'¿Qué requisito NO corresponde a las medidas cautelares?', opts:['Verosimilitud del derecho','Peligro en la demora','Contracautela','Sentencia previa firme'], c:3, exp:'Las medidas cautelares se dictan precisamente antes de la sentencia definitiva, para asegurar su futuro cumplimiento.', mod:'M4' },
+  { q:'La competencia federal es de carácter…', opts:['General y ordinaria','Exclusiva y permanente','Excepcional y de origen constitucional','Concurrente con la provincial en todos los casos'], c:2, exp:'La competencia federal es excepcional (solo para casos taxativamente previstos en la CN y leyes federales) y tiene base constitucional.', mod:'M4' },
+  { q:'El dolo eventual se configura cuando el autor…', opts:['Ignora el resultado típico','Quiere directamente el resultado','Conoce la probable producción del resultado y no deja de actuar, aceptándolo','No prevé el resultado pero debería haberlo hecho'], c:2, exp:'En el dolo eventual el autor se representa el resultado probable y lo acepta como consecuencia de su acción (teoría del asentimiento). Es el umbral mínimo del dolo.', mod:'M2' },
+  { q:'La legitimación ad causam se refiere a…', opts:['La capacidad para comparecer en juicio','La titularidad del derecho debatido en la relación jurídica material','La representación procesal del abogado','La competencia del juez para entender el caso'], c:1, exp:'La legitimación sustancial (ad causam) exige que quien reclama sea el titular del derecho invocado, a diferencia de la ad processum que es la capacidad de estar en juicio.', mod:'M4' }
+];
+
+const CASOS = [
+  {
+    id:'c1', mod:'M1',
+    titulo:'El decreto que no pudo reformar el Código Penal',
+    relato:`<p>El Poder Ejecutivo Nacional, ante la presión de la opinión pública por un aumento en los delitos contra la propiedad, emitió un <strong>Decreto de Necesidad y Urgencia (DNU)</strong> modificando el Código Penal: elevó las penas mínimas para el robo simple y agravado. El decreto fue publicado en el Boletín Oficial y comenzó a aplicarse. Un abogado defensor planteó la inconstitucionalidad del decreto en el juicio de su cliente, quien había sido imputado bajo las nuevas penas.</p>`,
+    preguntas:[
+      { text:'¿Por qué el DNU que modifica el Código Penal es inconstitucional?', opts:['Porque los DNU requieren mayoría de 2/3 del Congreso para ser válidos','Porque el art. 99 inc. 3 CN prohíbe expresamente que los DNU regulen materia penal','Porque el Código Penal solo puede ser modificado por una Convención Constituyente','Porque el Poder Ejecutivo no tiene iniciativa legislativa en materia penal'], c:1, exp:'El art. 99 inc. 3 CN es categórico: los DNU no pueden regular materia penal, tributaria, electoral ni régimen de partidos políticos. La modificación del Código Penal encuadra directamente en esa prohibición.' },
+      { text:'El abogado plantea la inconstitucionalidad en el juicio de su cliente. ¿Qué tipo de control de constitucionalidad está ejerciendo?', opts:['Control concentrado por acción directa','Control difuso por vía indirecta (incidental)','Control de oficio por el Tribunal Constitucional','Control erga omnes ante la Corte Suprema'], c:1, exp:'Es control difuso (cualquier juez puede ejercerlo) por vía indirecta: la inconstitucionalidad se plantea como defensa dentro de un proceso cuyo objeto principal es el juicio penal, no la inconstitucionalidad en sí misma.' },
+      { text:'Si el juez declara inconstitucional el DNU, ¿qué efecto tendrá esa resolución?', opts:['El DNU queda derogado para todos en el país','Solo beneficia al imputado en ese caso concreto (efecto inter partes)','El Congreso debe votar para confirmar la inconstitucionalidad','El Poder Ejecutivo debe retirar el decreto en 30 días'], c:1, exp:'En el sistema argentino, la regla general del control difuso es el efecto inter partes: la declaración de inconstitucionalidad solo aplica al caso concreto y no deroga la norma para el resto de los ciudadanos.' }
+    ]
+  },
+  {
+    id:'c2', mod:'M1',
+    titulo:'La doble reelección presidencial',
+    relato:`<p>El presidente en ejercicio, habiendo sido ya reelecto una vez (completando así dos mandatos consecutivos), pretende presentarse a elecciones por un tercer período consecutivo, argumentando que la Constitución "no lo prohíbe expresamente" y que el pueblo soberano tiene derecho a elegir a quien quiera. Sus asesores sostienen que basta con una ley del Congreso que "reinterprete" el art. 90 CN para habilitarlo.</p>`,
+    preguntas:[
+      { text:'¿Puede una ley del Congreso habilitar la segunda reelección consecutiva modificando el alcance del art. 90 CN?', opts:['Sí, el Congreso tiene poderes implícitos para reinterpretar la Constitución','No, modificar la Constitución requiere el procedimiento del art. 30 CN con Convención Constituyente','Sí, si la ley es aprobada por 2/3 de ambas Cámaras','No, pero sí podría hacerlo un DNU en caso de emergencia'], c:1, exp:'Una ley ordinaria no puede modificar la Constitución. El art. 30 CN establece el único procedimiento válido: declaración por el Congreso (2/3) + Convención Constituyente especialmente elegida. Esto es una garantía de la rigidez constitucional.' },
+      { text:'El art. 90 CN que limita la reelección presidencial a "un solo período consecutivo", ¿podría ser considerado una cláusula pétrea implícita?', opts:['No, solo las cláusulas expresas son pétreas','Sí, si forma parte de la estructura republicana y democrática que la Constitución protege','Sí, porque el art. 30 CN lo excluye expresamente de toda reforma','No, las cláusulas pétreas son solo las de los primeros 35 artículos'], c:1, exp:'Las cláusulas pétreas en Argentina son implícitas: surgen del espíritu y tradición histórico-constitucional. La forma republicana y democrática —incluyendo la alternancia en el poder— puede ser considerada un límite material al poder constituyente derivado.' }
+    ]
+  },
+  {
+    id:'c3', mod:'M2',
+    titulo:'La pelea en el bar',
+    relato:`<p>Carlos y Miguel discuten acaloradamente en un bar. Miguel saca un cuchillo y avanza hacia Carlos. Carlos, que no tiene arma, toma una silla de madera y golpea a Miguel en la cabeza. Miguel cae al suelo y sufre una fractura de cráneo con lesiones graves. Carlos es imputado por "lesiones graves" (art. 90 CP). En su defensa, alega que actuó para protegerse de la agresión de Miguel.</p>`,
+    preguntas:[
+      { text:'¿Carlos podría invocar legítima defensa?', opts:['No, porque usó un objeto más peligroso que el cuchillo de Miguel','Sí, si se acredita agresión ilegítima, necesidad racional del medio empleado y falta de provocación suficiente','Solo si Carlos no inició la discusión verbal','No, porque Miguel no llegó a herirlo efectivamente'], c:1, exp:'La legítima defensa requiere: agresión ilegítima (Miguel avanzó con cuchillo), necesidad racional del medio (el juez evaluará si la silla fue racional ante esa agresión) y falta de provocación suficiente. No se exige proporcionalidad matemática del arma.' },
+      { text:'¿Qué ocurre si el juez considera que Carlos se excedió en la defensa?', opts:['Se aplica la pena del delito consumado sin ninguna reducción','No hay delito porque la legítima defensa siempre justifica','Puede configurarse el "exceso en la legítima defensa", con pena reducida','Carlos responde como si hubiera actuado con premeditación'], c:2, exp:'El exceso en la legítima defensa (art. 35 CP) ocurre cuando se cumplen los requisitos de base pero se exceden los límites necesarios. La pena aplicable es la del delito culposo correspondiente, es decir, considerablemente reducida.' },
+      { text:'Desde la teoría del delito, ¿en qué categoría se analiza la legítima defensa?', opts:['En la acción, porque elimina la voluntad del autor','En la tipicidad, porque excluye la adecuación típica','En la antijuridicidad, como causa de justificación','En la culpabilidad, como causa de inimputabilidad'], c:2, exp:'Las causas de justificación (legítima defensa, estado de necesidad) operan en el plano de la antijuridicidad: eliminan la contradicción de la conducta con el ordenamiento jurídico, aunque la conducta sea típica.' }
+    ]
+  },
+  {
+    id:'c4', mod:'M2',
+    titulo:'El robo que no se terminó',
+    relato:`<p>Lucía y Pedro planifican robar una joyería. Pedro ingresa al local con una palanca mientras Lucía espera afuera con el auto en marcha para huir. Pedro ya había roto la vitrina y tomado algunas joyas cuando, por voluntad propia, se arrepiente, deja las joyas en el suelo, sale del local y se marcha. Lucía, al ver que Pedro sale sin nada, se va. Posteriormente ambos son detenidos e imputados.</p>`,
+    preguntas:[
+      { text:'¿Cuál es la situación jurídica de Pedro respecto al delito de robo?', opts:['Responde por robo consumado porque ya ingresó al local y tomó las joyas','Puede beneficiarse del desistimiento voluntario y quedar exento de pena por tentativa de robo','No comete delito porque no se llevó nada al final','Responde solo por daños a la propiedad (la vitrina rota)'], c:1, exp:'El desistimiento voluntario exime de la pena por tentativa cuando el autor abandona espontáneamente la ejecución. Pedro devolvió las joyas y se retiró voluntariamente. Sin embargo, puede responder por los actos ya consumados (daños a la vitrina).' },
+      { text:'¿Cuál es la responsabilidad de Lucía, que esperó afuera con el auto?', opts:['No responde porque no ingresó al local','Responde como coautora del robo frustrado','Puede responder como cómplice en la tentativa de robo, incluso si Pedro desistió','Responde solo si Lucía también desistió voluntariamente'], c:2, exp:'El desistimiento de Pedro no aprovecha automáticamente a Lucía. La participación de Lucía (esperar con el auto para la huida) ya configuró su intervención en la tentativa. El desistimiento es personal; para beneficiar a los partícipes, cada uno debe desistir.' },
+      { text:'Si Pedro hubiera consumado el robo y luego Lucía lo hubiera ayudado a vender las joyas, ¿cómo respondería Lucía?', opts:['Como cómplice necesaria del robo','Como cómplice no necesaria del robo','Como encubridora, ya que el robo ya estaba consumado','Como coautora del robo'], c:2, exp:'El encubrimiento (art. 277 CP) es un delito autónomo que consiste en ayudar a alguien que ya cometió un delito. Si Lucía no participó en el robo pero luego ayuda a vender lo robado, responde por encubrimiento, no como partícipe del robo.' }
+    ]
+  },
+  {
+    id:'c5', mod:'M3',
+    titulo:'El contrato viciado por dolo',
+    relato:`<p>Ramón vende su automóvil a Sara. Para convencerla de pagar un precio superior al de mercado, Ramón altera el kilometraje del vehículo con un dispositivo electrónico, mostrando 50.000 km cuando en realidad el auto tiene 180.000 km. Sara paga el precio acordado, pero tiempo después descubre el engaño y consulta a un abogado sobre qué acciones puede tomar.</p>`,
+    preguntas:[
+      { text:'¿Qué vicio del acto voluntario se configura en este caso?', opts:['Error esencial','Dolo esencial','Dolo incidental','Violencia moral'], c:1, exp:'Hay dolo esencial: Ramón empleó un artificio (alteración del cuentakilómetros) para inducir a Sara a celebrar el contrato y pagar un precio mayor. El dolo es grave, determinante del acto, causó daño relevante y no fue recíproco.' },
+      { text:'¿Cuál es el efecto jurídico del dolo esencial?', opts:['El contrato es válido pero Ramón debe devolver la diferencia de precio','Sara puede pedir la nulidad del contrato y la reparación de los daños','El contrato solo puede ser revisado judicialmente, no anulado','Ramón responde solo penalmente, no civilmente'], c:1, exp:'El dolo esencial produce la nulidad del acto jurídico. Además, la víctima tiene derecho a reclamar indemnización por los daños y perjuicios sufridos como consecuencia del engaño.' },
+      { text:'Si el mecánico de Ramón había alterado el kilometraje sin que Ramón lo supiera, ¿cambia la solución?', opts:['No, el dolo del tercero siempre produce nulidad automáticamente','Sí: si Ramón no sabía y no se benefició, no hay dolo del contratante; podría haber error','Sí: el contrato es válido y solo el mecánico responde','No, Sara igual puede pedir la nulidad porque el dolo existió objetivamente'], c:1, exp:'El dolo de un tercero requiere que el contratante que se beneficia haya conocido el engaño para que produzca la nulidad. Si Ramón no sabía y tampoco se benefició conscientemente, podría configurarse un error esencial y reconocible, con solución distinta.' }
+    ]
+  },
+  {
+    id:'c6', mod:'M3',
+    titulo:'El inmueble afectado como vivienda',
+    relato:`<p>Martín y Claudia son cónyuges. Martín afectó el inmueble donde viven como <strong>vivienda</strong> conforme al régimen del CCyC. Luego contrae una deuda con un banco para instalar un negocio y no puede pagarla. El banco inicia ejecución sobre ese inmueble para cobrar la deuda. Además, la empresa constructora que realizó refacciones en el inmueble también reclama el pago de su factura impaga.</p>`,
+    preguntas:[
+      { text:'¿Puede el banco ejecutar el inmueble afectado como vivienda para cobrar su crédito?', opts:['Sí, siempre que la deuda supere cierto monto','No, el inmueble afectado es inembargable e inejecutable por deudas posteriores a su afectación','Sí, porque los bancos tienen privilegio especial sobre bienes inmuebles','Solo si Claudia (cónyuge) también firmó la deuda'], c:1, exp:'El régimen de afectación de vivienda del CCyC establece la inembargabilidad e inejecutabilidad del inmueble por deudas posteriores a la afectación. El crédito del banco es posterior, por lo que el inmueble no puede ser ejecutado para cobrarlo.' },
+      { text:'¿La empresa constructora que hizo las refacciones puede ejecutar el inmueble?', opts:['No, porque el inmueble está afectado como vivienda y es inembargable en todos los casos','Sí, porque las obligaciones por mejoras y refacciones sobre el inmueble son una excepción a la inembargabilidad','Solo si las refacciones superaron un determinado valor económico','No, pero puede pedir la desafectación del inmueble'], c:1, exp:'El CCyC establece expresamente como excepción a la inembargabilidad las obligaciones que reconocen como causa la construcción u otras mejoras realizadas en la vivienda. Las refacciones encuadran en esa excepción, por lo que la constructora sí puede ejecutar.' }
+    ]
+  },
+  {
+    id:'c7', mod:'M4',
+    titulo:'La demanda ante el juez equivocado',
+    relato:`<p>Un trabajador que presta servicios en la ciudad de Córdoba para una empresa con sede en Buenos Aires sufre un accidente laboral. Inicia la demanda por indemnización ante el <strong>Juzgado Federal Civil de Córdoba</strong>, argumentando que la empresa es grande y tiene contratos con el Estado Nacional. La empresa contesta la demanda sin oponer ninguna excepción y en su presentación responde el fondo del asunto. Meses después, el juez federal advierte el problema.</p>`,
+    preguntas:[
+      { text:'¿Era competente el fuero federal para entender en este reclamo laboral?', opts:['Sí, porque la empresa tiene contratos con el Estado Nacional','No, los reclamos laborales entre particulares son de competencia ordinaria provincial','Sí, porque el accidente involucra legislación laboral nacional (Código de fondo)','Sí, si el monto del reclamo supera cierto valor'], c:1, exp:'La competencia federal es excepcional y solo procede en los casos taxativamente previstos (materia constitucional/federal o personas de especial estatuto). Un reclamo laboral entre particulares, aunque se rija por leyes nacionales, corresponde a la justicia ordinaria provincial.' },
+      { text:'La empresa contestó la demanda sin oponer excepción de incompetencia. ¿Qué consecuencia tiene esto?', opts:['La empresa pierde el derecho a cuestionar la competencia territorial pero no la de materia','La competencia en materia laboral es improrrogable, por lo que el juez debe inhibirse de oficio aunque la empresa no haya objetado','La empresa prorrogó la competencia tácitamente y el juez ya no puede excusarse','No tiene consecuencias: la incompetencia siempre puede plantearse en cualquier etapa'], c:1, exp:'La competencia por razón de materia (fuero) es de orden público e improrrogable. No puede ser prorrogada ni por el acuerdo expreso ni por la conducta omisiva de las partes. El juez federal debe inhibirse aunque nadie lo haya pedido.' },
+      { text:'¿Qué debe hacer el juez federal al advertir su falta de competencia?', opts:['Dictar sentencia de fondo porque ya hay cosa juzgada parcial','Inhibirse de oficio y remitir las actuaciones al juez laboral competente','Anular todo lo actuado y obligar al trabajador a comenzar de nuevo','Continuar hasta la sentencia y plantear la cuestión al tribunal superior'], c:1, exp:'Al advertir su incompetencia en razón de la materia, el juez debe inhibirse de oficio mediante una resolución y remitir las actuaciones al juez competente (el laboral provincial). Los actos procesales realizados hasta ese momento conservan validez.' }
+    ]
+  },
+  {
+    id:'c8', mod:'M4',
+    titulo:'La medida cautelar urgente',
+    relato:`<p>Una empresa constructora demanda a su cliente por el cobro de $5.000.000 por obras realizadas. Al mismo tiempo, solicita al juez una <strong>medida cautelar de embargo preventivo</strong> sobre cuentas bancarias del demandado, argumentando que hay indicios de que el cliente está vaciando sus activos para no poder cobrarle. El cliente no ha sido notificado todavía de la medida. La empresa ofrece como contracautela una caución juratoria.</p>`,
+    preguntas:[
+      { text:'¿Cuáles son los requisitos que el juez debe verificar para conceder el embargo preventivo?', opts:['Solo que la deuda esté documentada en un instrumento público','Verosimilitud del derecho (fumus boni iuris) y peligro en la demora (periculum in mora), más contracautela','Sentencia previa favorable a la empresa más el depósito del monto reclamado','Que el demandado haya sido notificado y no haya pagado en el plazo fijado'], c:1, exp:'Las medidas cautelares requieren: (1) fumus boni iuris: apariencia de que el derecho invocado existe (el contrato de obra), (2) periculum in mora: riesgo de que sin la medida el cobro futuro sea imposible (vaciamiento de activos), y (3) contracautela para responder por eventuales daños.' },
+      { text:'La medida se dicta sin notificar al demandado. ¿Es esto válido?', opts:['No, siempre debe escucharse a la parte contraria antes de cualquier medida','Sí, las medidas cautelares se dictan inaudita parte (sin audiencia previa del afectado) para no frustrar su finalidad','Solo es válido si el juez considera que hay urgencia extrema','Solo es válido en procesos penales, no en civiles'], c:1, exp:'La característica de las medidas cautelares es precisamente que se dictan inaudita altera pars (sin previo conocimiento de la parte contraria) para evitar que el deudor tome medidas para eludir el cobro. El afectado podrá cuestionarla una vez notificado.' },
+      { text:'¿Las medidas cautelares producen cosa juzgada material?', opts:['Sí, una vez firmes no pueden ser revisadas','No, son provisionales y mutables: pueden modificarse o levantarse si cambian las circunstancias','Sí, pero solo la cosa juzgada formal','No, pero tampoco pueden ser levantadas antes de la sentencia definitiva'], c:1, exp:'Las medidas cautelares son provisionales y mutables: no producen cosa juzgada material. Pueden ser modificadas, ampliadas, reducidas o levantadas en cualquier momento si cambian las circunstancias que las justificaron, incluso antes de la sentencia.' }
+    ]
+  }
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentMod = 'all';
+let currentMode = 'explorar';
+let quizList = [], quizIdx = 0, quizCorrect = 0, quizAnswered = false;
+let casoIdx = 0;
+let casoAnswered = {}; // {casoId: {qIdx: true/false}}
+
+// ─────────────────────────────────────────────
+// MOD / MODE
+// ─────────────────────────────────────────────
+function setMod(mod, btn) {
+  currentMod = mod;
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (currentMode === 'explorar') renderBrowse();
+  else if (currentMode === 'quiz') startQuiz();
+  else if (currentMode === 'casos') renderCasos();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  ['explorar','quiz','casos'].forEach(m => {
+    document.getElementById('btn-'+m).classList.toggle('active', m === mode);
+    document.getElementById('screen-'+m).classList.toggle('visible', m === mode);
+  });
+  document.getElementById('screen-detail').classList.remove('visible');
+  if (mode === 'explorar') renderBrowse();
+  else if (mode === 'quiz') startQuiz();
+  else if (mode === 'casos') renderCasos();
+}
+
+// ─────────────────────────────────────────────
+// EXPLORAR
+// ─────────────────────────────────────────────
+function renderBrowse() {
+  document.getElementById('screen-detail').classList.remove('visible');
+  document.getElementById('screen-explorar').classList.add('visible');
+  const list = currentMod === 'all' ? TOPICS : TOPICS.filter(t => t.mod === currentMod);
+  document.getElementById('topic-grid').innerHTML = list.map(t => {
+    const idx = TOPICS.indexOf(t);
+    return `<div class="topic-card" onclick="openDetail(${idx})">
+      <span class="tc-badge ${MOD_COLORS[t.mod]}">${t.mod}</span>
+      <div class="tc-title">${t.title}</div>
+    </div>`;
+  }).join('');
+}
+
+function openDetail(idx) {
+  document.getElementById('screen-explorar').classList.remove('visible');
+  document.getElementById('screen-detail').classList.add('visible');
+  const t = TOPICS[idx];
+  document.getElementById('detail-title').textContent = t.title;
+  document.getElementById('detail-body').innerHTML = t.summary;
+}
+
+function closeDetail() {
+  document.getElementById('screen-detail').classList.remove('visible');
+  document.getElementById('screen-explorar').classList.add('visible');
+}
+
+// ─────────────────────────────────────────────
+// QUIZ
+// ─────────────────────────────────────────────
+function startQuiz() {
+  quizList = (currentMod === 'all' ? [...QUIZ] : QUIZ.filter(q => q.mod === currentMod))
+    .sort(() => Math.random() - 0.5);
+  quizIdx = 0; quizCorrect = 0; quizAnswered = false;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const inner = document.getElementById('quiz-inner');
+  const total = quizList.length;
+  if (!total) {
+    document.getElementById('quiz-prog-text').textContent = '';
+    document.getElementById('quiz-score-text').textContent = '';
+    document.getElementById('quiz-fill').style.width = '0%';
+    inner.innerHTML = '<p class="empty-msg">No hay preguntas para este módulo.</p>';
+    return;
+  }
+  if (quizIdx >= total) {
+    document.getElementById('quiz-prog-text').textContent = 'Finalizado';
+    document.getElementById('quiz-score-text').textContent = `${quizCorrect}/${total} correctas`;
+    document.getElementById('quiz-fill').style.width = '100%';
+    const pct = Math.round(quizCorrect/total*100);
+    inner.innerHTML = `<div class="quiz-result">
+      <div class="score-num">${quizCorrect}/${total}</div>
+      <div class="score-label">${pct}% correctas — ${pct===100?'¡Perfecto!':pct>=70?'Muy bien, seguí repasando.':'Revisá los temas donde fallaste.'}</div>
+      <button class="quiz-next" onclick="startQuiz()">Reiniciar preguntas</button>
+    </div>`;
+    return;
+  }
+  const q = quizList[quizIdx];
+  document.getElementById('quiz-prog-text').textContent = `Pregunta ${quizIdx+1} de ${total}`;
+  document.getElementById('quiz-score-text').textContent = `${quizCorrect} correctas`;
+  document.getElementById('quiz-fill').style.width = `${(quizIdx/total)*100}%`;
+  quizAnswered = false;
+  inner.innerHTML = `<p class="quiz-q">${q.q}</p>
+    <div class="quiz-opts">${q.opts.map((o,i)=>`<button type="button" class="quiz-opt" onclick="answerQuiz(${i})">${o}</button>`).join('')}</div>
+    <div class="quiz-feedback" id="qfb" style="display:none"></div>
+    <button class="quiz-next" id="qnext" style="display:none" onclick="nextQuizQ()">Siguiente →</button>`;
+}
+
+function answerQuiz(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = quizList[quizIdx];
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+  document.querySelectorAll('.quiz-opt')[q.c].classList.add('correct');
+  if (i !== q.c) document.querySelectorAll('.quiz-opt')[i].classList.add('wrong');
+  else quizCorrect++;
+  const fb = document.getElementById('qfb');
+  fb.style.display = 'block';
+  fb.innerHTML = `<strong>${i===q.c?'Correcto.':'Incorrecto.'}</strong> ${q.exp}`;
+  document.getElementById('qnext').style.display = 'inline-block';
+}
+
+function nextQuizQ() { quizIdx++; renderQuiz(); }
+
+// ─────────────────────────────────────────────
+// CASOS
+// ─────────────────────────────────────────────
+function casosList() {
+  return currentMod === 'all' ? CASOS : CASOS.filter(c => c.mod === currentMod);
+}
+
+function renderCasos() {
+  const list = casosList();
+  if (!list.length) {
+    document.getElementById('caso-selector').innerHTML = '';
+    document.getElementById('caso-display').innerHTML = '<p class="empty-msg">No hay casos para este módulo.</p>';
+    return;
+  }
+  if (casoIdx >= list.length) casoIdx = 0;
+  // selector
+  document.getElementById('caso-selector').innerHTML = list.map((c,i) => {
+    const num = i+1;
+    return `<button type="button" class="caso-thumb ${i===casoIdx?'active':''}" onclick="selectCaso(${i})">${MOD_LABELS[c.mod].split('·')[0].trim()} · Caso ${num}</button>`;
+  }).join('');
+  renderCasoCard(list[casoIdx]);
+}
+
+function selectCaso(i) {
+  casoIdx = i;
+  renderCasos();
+}
+
+function renderCasoCard(caso) {
+  if (!casoAnswered[caso.id]) casoAnswered[caso.id] = {};
+  const modLabel = MOD_LABELS[caso.mod];
+  const colorClass = { M1:'badge-M1', M2:'badge-M2', M3:'badge-M3', M4:'badge-M4' }[caso.mod];
+  const list = casosList();
+  const idx = list.indexOf(caso);
+  const answered = Object.keys(casoAnswered[caso.id]).length;
+  const correct = Object.values(casoAnswered[caso.id]).filter(Boolean).length;
+
+  const pregsHTML = caso.preguntas.map((p, qi) => {
+    const ans = casoAnswered[caso.id][qi];
+    const wasAnswered = ans !== undefined;
+    return `<div class="caso-pregunta">
+      <p class="cpq-text">${qi+1}. ${p.text}</p>
+      <div class="cpq-opts">${p.opts.map((o,oi) => {
+        let cls = '';
+        if (wasAnswered) {
+          if (oi === p.c) cls = 'correct';
+          else if (oi === ans && ans !== p.c) cls = 'wrong';
+        }
+        return `<button type="button" class="cpq-opt ${cls}" ${wasAnswered?'disabled':''} onclick="answerCaso('${caso.id}',${qi},${oi})">${o}</button>`;
+      }).join('')}</div>
+      ${wasAnswered ? `<div class="cpq-feedback"><strong>${ans===p.c?'Correcto.':'Incorrecto.'}</strong> ${p.exp}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('caso-display').innerHTML = `
+    <div class="caso-card">
+      <div class="caso-header">
+        <span class="caso-num">Caso ${idx+1}</span>
+        <div class="caso-title-block">
+          <div class="caso-title">${caso.titulo}</div>
+          <span class="caso-badge tc-badge ${colorClass}">${modLabel}</span>
+        </div>
+      </div>
+      <div class="caso-body">
+        <div class="caso-relato">${caso.relato}</div>
+        <div class="caso-preguntas">${pregsHTML}</div>
+      </div>
+      <div class="caso-footer">
+        <span class="caso-score-text">${answered > 0 ? `${correct}/${answered} correctas` : 'Respondé las preguntas'}</span>
+        <div class="caso-nav">
+          ${idx > 0 ? `<button type="button" class="btn-sm" onclick="selectCaso(${idx-1})">← Anterior</button>` : ''}
+          ${idx < list.length-1 ? `<button type="button" class="btn-sm" onclick="selectCaso(${idx+1})">Siguiente →</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function answerCaso(casoId, qi, oi) {
+  const caso = CASOS.find(c => c.id === casoId);
+  if (!casoAnswered[casoId]) casoAnswered[casoId] = {};
+  if (casoAnswered[casoId][qi] !== undefined) return;
+  casoAnswered[casoId][qi] = oi;
+  renderCasoCard(caso);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+renderBrowse();
+</script>
+</body>
+</html>
